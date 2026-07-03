@@ -39,3 +39,38 @@ Built the backend API using Express, Node.js, and MongoDB (via Mongoose), with J
 - MongoDB Atlas with Mongoose
 - JSON Web Tokens (jsonwebtoken) for authentication
 - bcryptjs for password hashing
+
+## Phase 3: Deployment (Complete)
+
+Connected the frontend to the live backend and deployed both to the internet, so LumiCart works as a real, testable website rather than only on localhost.
+
+### What's included
+- Frontend fully connected to the real API (no more mock data)
+- Working login, registration, and JWT-based authentication in the UI
+- Real shopping cart tied to each user's account
+- Checkout flow that creates real orders in the database
+- Order history page for logged in users
+- Backend deployed to Render
+- Frontend deployed to Vercel
+- MongoDB Atlas configured to accept connections from the deployed backend
+
+### Live links
+- Frontend: (https://lumicart-mern1.vercel.app/)
+- Backend API: (https://lumicart-mern.onrender.com)
+
+### Tech used
+- React, Vite, React Router (frontend)
+- Node.js, Express, MongoDB, Mongoose (backend)
+- JSON Web Tokens for authentication
+- Render (backend hosting)
+- Vercel (frontend hosting)
+- MongoDB Atlas (database hosting)
+
+### Environment variables
+
+**Backend (Render):**
+MONGO_URI=my MongoDB Atlas connection string
+JWT_SECRET=my secret key
+
+**Frontend (Vercel):**
+VITE_API_URL=your Render backend URL followed by /api
