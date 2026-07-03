@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { products } from '../data/products'
+import { fetchProducts } from '../services/api'
 import ProductCard from '../components/ProductCard'
 import CategoryFilter from '../components/CategoryFilter'
 import './Shop.css'
@@ -10,17 +10,21 @@ export default function Shop() {
   const category = searchParams.get('category')
   const searchTerm = searchParams.get('search') || ''
   const [localSearch, setLocalSearch] = useState(searchTerm)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const matchesCategory = !category || p.category === category
-      const matchesSearch =
-        !searchTerm ||
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.tagline.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.ingredients.some((i) => i.toLowerCase().includes(searchTerm.toLowerCase()))
-      return matchesCategory && matchesSearch
-    })
+  useEffect(() => {
+    setLoading(true)
+    setError('')
+    const params = {}
+    if (category) params.category = category
+    if (searchTerm) params.search = searchTerm
+
+    fetchProducts(params)
+      .then(setProducts)
+      .catch(() => setError('Could not load products right now. Please try again.'))
+      .finally(() => setLoading(false))
   }, [category, searchTerm])
 
   const handleCategoryChange = (id) => {
@@ -44,8 +48,8 @@ export default function Shop() {
         <div>
           <h2>All products</h2>
           <p className="shop-count">
-            {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
-            {searchTerm && (
+            {loading ? 'Loading...' : `${products.length} ${products.length === 1 ? 'product' : 'products'}`}
+            {!loading && searchTerm && (
               <>
                 {' '}
                 for "<strong>{searchTerm}</strong>"
@@ -70,13 +74,17 @@ export default function Shop() {
 
       <CategoryFilter active={category} onChange={handleCategoryChange} />
 
-      {filtered.length > 0 ? (
+      {error && <div className="shop-empty"><p>{error}</p></div>}
+
+      {!error && !loading && products.length > 0 && (
         <div className="product-grid">
-          {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {products.map((p) => (
+            <ProductCard key={p._id} product={p} />
           ))}
         </div>
-      ) : (
+      )}
+
+      {!error && !loading && products.length === 0 && (
         <div className="shop-empty">
           <h3>No products match yet</h3>
           <p>Try a different search term, or clear your filters.</p>

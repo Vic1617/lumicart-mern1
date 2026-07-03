@@ -28,15 +28,44 @@
 
 .cart-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
   gap: 20px;
   padding: 16px 0;
   border-bottom: 1px solid var(--line);
   font-size: 15px;
 }
 
-.cart-row-qty {
-  color: var(--ink-soft);
+.cart-row-qty-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-row-qty-control button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cart-row-qty-control button:hover {
+  border-color: var(--sage);
+}
+
+.cart-row-remove {
+  background: none;
+  border: none;
+  color: var(--clay);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cart-row-remove:hover {
+  text-decoration: underline;
 }
 
 .cart-total {
@@ -45,6 +74,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   padding: 16px 0;
+  margin-bottom: 20px;
   font-weight: 600;
 }
 

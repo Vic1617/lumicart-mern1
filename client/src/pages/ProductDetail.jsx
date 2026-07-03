@@ -1,26 +1,67 @@
-import { useState } from 'react'
-import { Link, useParams, Navigate } from 'react-router-dom'
-import { getProductById, products } from '../data/products'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { fetchProductById, fetchProducts } from '../services/api'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import ProductCard from '../components/ProductCard'
 import './ProductDetail.css'
 
 export default function ProductDetail() {
   const { id } = useParams()
-  const product = getProductById(id)
   const { addItem } = useCart()
-  const [added, setAdded] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
-  if (!product) {
-    return <Navigate to="/shop" replace />
+  const [product, setProduct] = useState(null)
+  const [related, setRelated] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [added, setAdded] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    setError('')
+    fetchProductById(id)
+      .then((data) => {
+        setProduct(data)
+        return fetchProducts({ category: data.category })
+      })
+      .then((data) => {
+        setRelated(data.filter((p) => p._id !== id).slice(0, 4))
+      })
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  const handleAdd = async () => {
+    if (!user) {
+      navigate('/login', { state: { from: { pathname: `/product/${id}` } } })
+      return
+    }
+    setError('')
+    try {
+      await addItem(product)
+      setAdded(true)
+      setTimeout(() => setAdded(false), 1800)
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  if (loading) {
+    return <p className="container section loading-text">Loading product...</p>
+  }
 
-  const handleAdd = () => {
-    addItem(product)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1800)
+  if (notFound || !product) {
+    return (
+      <div className="container section">
+        <p>We couldn't find that product.</p>
+        <Link to="/shop" className="btn btn-outline">
+          Back to shop
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -53,8 +94,10 @@ export default function ProductDetail() {
             </ul>
           </div>
 
+          {error && <p className="auth-error">{error}</p>}
+
           <button className="btn btn-primary btn-block product-detail-add" onClick={handleAdd}>
-            {added ? 'Added to bag ✓' : `Add to bag — $${product.price}`}
+            {added ? 'Added to bag ✓' : `Add to bag - $${product.price}`}
           </button>
         </div>
       </div>
@@ -66,7 +109,7 @@ export default function ProductDetail() {
           </div>
           <div className="product-grid">
             {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p._id} product={p} />
             ))}
           </div>
         </section>

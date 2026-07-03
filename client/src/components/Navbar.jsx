@@ -1,14 +1,23 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { categories } from '../data/products'
+import { categories } from '../data/categories'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
 
 export default function Navbar() {
   const [query, setQuery] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const navigate = useNavigate()
   const { count } = useCart()
+  const { user, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    setAccountOpen(false)
+    navigate('/')
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -49,9 +58,38 @@ export default function Navbar() {
         </form>
 
         <div className="nav-actions">
-          <Link to="/shop" className="nav-icon-link" aria-label="Shop all">
-            <UserIcon />
-          </Link>
+          <div className="nav-account">
+            <button
+              className="nav-icon-link"
+              aria-label="Account menu"
+              aria-expanded={accountOpen}
+              onClick={() => setAccountOpen((v) => !v)}
+            >
+              <UserIcon />
+            </button>
+            {accountOpen && (
+              <div className="nav-account-dropdown">
+                {user ? (
+                  <>
+                    <p className="nav-account-greeting">Hi, {user.name.split(' ')[0]}</p>
+                    <Link to="/orders" onClick={() => setAccountOpen(false)}>
+                      Order history
+                    </Link>
+                    <button onClick={handleLogout}>Log out</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setAccountOpen(false)}>
+                      Log in
+                    </Link>
+                    <Link to="/register" onClick={() => setAccountOpen(false)}>
+                      Create account
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
           <Link to="/cart" className="nav-icon-link nav-cart" aria-label="View bag">
             <BagIcon />
             {count > 0 && <span className="nav-cart-count">{count}</span>}

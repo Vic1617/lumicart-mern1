@@ -1,4 +1,4 @@
-import { categories } from '../data/products'
+import { categories } from '../data/categories'
 import './CategoryFilter.css'
 
 export default function CategoryFilter({ active, onChange }) {

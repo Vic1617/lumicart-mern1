@@ -3,8 +3,11 @@ import { useCart } from '../context/CartContext'
 import './Cart.css'
 
 export default function Cart() {
-  const { items } = useCart()
-  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const { items, loading, updateQty, removeItem, subtotal } = useCart()
+
+  if (loading) {
+    return <p className="container section loading-text">Loading your bag...</p>
+  }
 
   return (
     <div className="container section cart-page">
@@ -21,21 +24,37 @@ export default function Cart() {
         <>
           <ul className="cart-list">
             {items.map((item) => (
-              <li key={item.id} className="cart-row">
+              <li key={item.product} className="cart-row">
                 <span>{item.name}</span>
-                <span className="cart-row-qty">x{item.qty}</span>
+                <div className="cart-row-qty-control">
+                  <button
+                    aria-label="Decrease quantity"
+                    onClick={() => updateQty(item.product, Math.max(1, item.qty - 1))}
+                  >
+                    -
+                  </button>
+                  <span>{item.qty}</span>
+                  <button
+                    aria-label="Increase quantity"
+                    onClick={() => updateQty(item.product, item.qty + 1)}
+                  >
+                    +
+                  </button>
+                </div>
                 <span>${(item.price * item.qty).toFixed(2)}</span>
+                <button className="cart-row-remove" onClick={() => removeItem(item.product)}>
+                  Remove
+                </button>
               </li>
             ))}
           </ul>
           <div className="cart-total">
             <span>Subtotal</span>
-            <span>${total.toFixed(2)}</span>
+            <span>${subtotal.toFixed(2)}</span>
           </div>
-          <p className="cart-note">
-            Checkout, authentication, and order history connect once the Express + MongoDB
-            backend lands in Phase 2.
-          </p>
+          <Link to="/checkout" className="btn btn-primary btn-block">
+            Continue to checkout
+          </Link>
         </>
       )}
     </div>

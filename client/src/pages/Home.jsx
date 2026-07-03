@@ -1,10 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { products, categories } from '../data/products'
+import { categories } from '../data/categories'
+import { fetchProducts } from '../services/api'
 import ProductCard from '../components/ProductCard'
 import './Home.css'
 
 export default function Home() {
-  const bestsellers = products.slice(0, 4)
+  const [bestsellers, setBestsellers] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchProducts()
+      .then((data) => setBestsellers(data.slice(0, 4)))
+      .catch(() => setBestsellers([]))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <div>
@@ -73,11 +83,15 @@ export default function Home() {
             View all products
           </Link>
         </div>
-        <div className="product-grid">
-          {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        {loading ? (
+          <p className="loading-text">Loading products...</p>
+        ) : (
+          <div className="product-grid">
+            {bestsellers.map((p) => (
+              <ProductCard key={p._id} product={p} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Brand band */}

@@ -3,7 +3,7 @@ import './ProductCard.css'
 
 export default function ProductCard({ product }) {
   return (
-    <Link to={`/product/${product.id}`} className="product-card">
+    <Link to={`/product/${product._id}`} className="product-card">
       <div className="product-card-image">
         <img src={product.image} alt={product.name} loading="lazy" />
       </div>

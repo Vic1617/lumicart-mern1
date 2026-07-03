@@ -88,6 +88,13 @@ input:focus-visible {
   padding: 0 24px;
 }
 
+.loading-text {
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-align: center;
+  padding: 60px 0;
+}
+
 .eyebrow {
   font-family: var(--font-body);
   font-size: 12px;
